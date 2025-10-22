@@ -1,1 +1,556 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Path: Путь Веб-Мастера</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a2a6c 0%, #b21f1f 50%, #fdbb2d 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+            color: white;
+            padding: 35px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0,0 L100,0 L100,100 Z" fill="rgba(255,255,255,0.1)"/></svg>');
+            background-size: cover;
+        }
+
+        .header h1 {
+            font-size: 2.8em;
+            margin-bottom: 15px;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.5);
+            position: relative;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 12px;
+            background: rgba(255,255,255,0.2);
+            margin: 25px 0;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress {
+            height: 100%;
+            background: linear-gradient(90deg, #00b4db 0%, #0083b0 100%);
+            width: 0%;
+            transition: width 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
+            position: relative;
+        }
+
+        .progress::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 20px;
+            background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 100%);
+        }
+
+        .quest-content {
+            padding: 35px;
+            min-height: 450px;
+        }
+
+        .challenge {
+            display: none;
+        }
+
+        .challenge.active {
+            display: block;
+            animation: slideIn 0.6s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .challenge h2 {
+            color: #1a2a6c;
+            margin-bottom: 25px;
+            border-left: 6px solid #fdbb2d;
+            padding-left: 18px;
+            font-size: 1.8em;
+        }
+
+        .task {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            padding: 25px;
+            border-radius: 15px;
+            margin: 25px 0;
+            border-left: 5px solid #0083b0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+
+        .task p {
+            line-height: 1.6;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+
+        .code-editor {
+            background: #1e3c72;
+            color: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 18px 0;
+            font-family: 'Fira Code', 'Courier New', monospace;
+            min-height: 120px;
+            line-height: 1.5;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+            border: 1px solid #2a4a7a;
+        }
+
+        .input-group {
+            margin: 25px 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+
+        input, select, button {
+            padding: 14px 18px;
+            border: 2px solid #dce6f0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        input, select {
+            flex: 1;
+            min-width: 200px;
+            background: white;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #0083b0;
+            box-shadow: 0 0 0 3px rgba(0, 131, 176, 0.2);
+        }
+
+        button {
+            background: linear-gradient(135deg, #00b4db 0%, #0083b0 100%);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            min-width: 140px;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 15px rgba(0, 131, 176, 0.4);
+        }
+
+        .feedback {
+            padding: 18px;
+            border-radius: 10px;
+            margin: 18px 0;
+            display: none;
+            font-weight: 500;
+        }
+
+        .feedback.success {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            color: #155724;
+            border: 1px solid #b1dfbb;
+            display: block;
+        }
+
+        .feedback.error {
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            color: #721c24;
+            border: 1px solid #f1b0b7;
+            display: block;
+        }
+
+        .hint {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            color: #856404;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-size: 0.95em;
+            border-left: 4px solid #ffc107;
+        }
+
+        .completion {
+            text-align: center;
+            padding: 60px 25px;
+            display: none;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            border-radius: 15px;
+        }
+
+        .completion h2 {
+            color: #1a2a6c;
+            font-size: 2.8em;
+            margin-bottom: 25px;
+        }
+
+        .badge {
+            font-size: 5em;
+            margin: 25px 0;
+            background: linear-gradient(135deg, #fdbb2d 0%, #b21f1f 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
+        }
+
+        .level-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            padding: 0 10px;
+        }
+
+        .level-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #dce6f0;
+            transition: all 0.3s ease;
+        }
+
+        .level-dot.active {
+            background: #0083b0;
+            transform: scale(1.3);
+        }
+
+        .demo-element {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border: 2px dashed #2196f3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💻 Digital Path: Путь Веб-Мастера</h1>
+            <p>Освой искусство создания современных веб-интерфейсов!</p>
+            <div class="progress-bar">
+                <div class="progress" id="progress"></div>
+            </div>
+        </div>
+
+        <div class="quest-content">
+            <div class="level-indicator">
+                <div class="level-dot active" id="dot-1"></div>
+                <div class="level-dot" id="dot-2"></div>
+                <div class="level-dot" id="dot-3"></div>
+                <div class="level-dot" id="dot-4"></div>
+            </div>
+
+            <!-- Этап 1: Навигационное меню -->
+            <div class="challenge active" id="challenge-1">
+                <h2>🧭 Этап 1: Навигационное меню</h2>
+                <div class="task">
+                    <p>Создай основную навигацию для сайта. Навигация - это карта для пользователей!</p>
+                    <div class="code-editor" id="html-editor">
+&lt;!-- Создай навигационное меню --&gt;
+&lt;nav class="main-nav"&gt;
+    &lt;ul&gt;
+        &lt;li&gt;<span id="html-cursor">&nbsp;</span>&lt;/li&gt;
+        &lt;li&gt;О нас&lt;/li&gt;
+        &lt;li&gt;Контакты&lt;/li&gt;
+    &lt;/ul&gt;
+&lt;/nav&gt;
+                    </div>
+                    <div class="hint">
+                        💡 Совет: Первый пункт меню обычно ведет на главную страницу. Используй тег &lt;a&gt; с href="#"
+                    </div>
+                    <div class="input-group">
+                        <input type="text" id="html-input" placeholder="Введи код для первого пункта меню">
+                        <button onclick="checkHTML()">Проверить код</button>
+                    </div>
+                    <div class="feedback" id="html-feedback"></div>
+                </div>
+            </div>
+
+            <!-- Этап 2: Стилизация карточки -->
+            <div class="challenge" id="challenge-2">
+                <h2>🎴 Этап 2: Карточка продукта</h2>
+                <div class="task">
+                    <p>Оформи карточку продукта с тенью и плавными переходами для современного вида:</p>
+                    <div class="code-editor">
+/* Стили для карточки продукта */
+.product-card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    <span id="css-cursor">&nbsp;</span>
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+}
+                    </div>
+                    <div class="demo-element">
+                        🎴 Демо: Карточка продукта
+                    </div>
+                    <div class="input-group">
+                        <select id="css-select">
+                            <option value="">Выбери стилевое решение</option>
+                            <option value="box-shadow: 0 8px 25px rgba(0,0,0,0.15); transition: all 0.3s ease;">Тень с анимацией</option>
+                            <option value="border: 2px solid #e0e0e0; background: linear-gradient(135deg, #fff, #f9f9f9);">Градиентный фон с рамкой</option>
+                            <option value="box-shadow: 0 4px 12px rgba(0,0,0,0.1); border-left: 4px solid #00b4db;">Тень с акцентной полосой</option>
+                        </select>
+                        <button onclick="checkCSS()">Применить стили</button>
+                    </div>
+                    <div class="feedback" id="css-feedback"></div>
+                </div>
+            </div>
+
+            <!-- Этап 3: Интерактивная галерея -->
+            <div class="challenge" id="challenge-3">
+                <h2>🖼️ Этап 3: Галерея изображений</h2>
+                <div class="task">
+                    <p>Создай функцию для переключения изображений в галерее:</p>
+                    <div class="code-editor">
+let currentImage = 0;
+const images = ['image1.jpg', 'image2.jpg', 'image3.jpg'];
+
+function nextImage() {
+    <span id="js-cursor">&nbsp;</span>
+    document.getElementById('gallery-img').src = images[currentImage];
+}
+
+function prevImage() {
+    currentImage = (currentImage - 1 + images.length) % images.length;
+    document.getElementById('gallery-img').src = images[currentImage];
+}
+                    </div>
+                    <div class="hint">
+                        💡 Подсказка: Нужно увеличить currentImage и убедиться, что он не превышает количество изображений
+                    </div>
+                    <div class="input-group">
+                        <input type="text" id="js-input" placeholder="Введи код для увеличения currentImage">
+                        <button onclick="checkJS()">Запустить скрипт</button>
+                    </div>
+                    <div class="feedback" id="js-feedback"></div>
+                </div>
+            </div>
+
+            <!-- Этап 4: Форма обратной связи -->
+            <div class="challenge" id="challenge-4">
+                <h2>📝 Этап 4: Валидация формы</h2>
+                <div class="task">
+                    <p>Создай полную систему валидации для формы обратной связи:</p>
+                    <div class="code-editor">
+&lt;!-- HTML форма --&gt;
+&lt;form id="feedback-form"&gt;
+    &lt;input type="text" id="name" placeholder="Ваше имя" required&gt;
+    &lt;input type="email" id="email" placeholder="Email" required&gt;
+    &lt;textarea id="message" placeholder="Сообщение"&gt;&lt;/textarea&gt;
+    &lt;button type="submit"&gt;Отправить&lt;/button&gt;
+&lt;/form&gt;
+
+&lt;script&gt;
+document.getElementById('feedback-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const name = document.getElementById('name').value;
+    const email = document.getElementById('email').value;
+    <span id="combined-cursor">&nbsp;</span>
+    
+    if (name && email.includes('@')) {
+        alert('Форма успешно отправлена!');
+        this.reset();
+    } else {
+        alert('Пожалуйста, заполните все поля корректно!');
+    }
+});
+&lt;/script&gt;
+                    </div>
+                    <div class="hint">
+                        💡 Подсказка: Добавь проверку на пустые поля и правильность email
+                    </div>
+                    <div class="input-group">
+                        <button onclick="showHint(4)">Показать решение</button>
+                        <button onclick="checkCombined()">Протестировать форму</button>
+                    </div>
+                    <div class="feedback" id="combined-feedback"></div>
+                </div>
+            </div>
+
+            <!-- Завершение -->
+            <div class="completion" id="completion">
+                <div class="badge">🏆</div>
+                <h2>Миссия выполнена!</h2>
+                <p>Ты успешно освоил создание современных веб-компонентов!</p>
+                <p>Навигация, карточки, галереи и формы - теперь твои сильные стороны!</p>
+                <button onclick="restartQuest()">Пройти еще раз</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentLevel = 1;
+        const totalLevels = 4;
+
+        function updateProgress() {
+            const progress = (currentLevel / totalLevels) * 100;
+            document.getElementById('progress').style.width = progress + '%';
+            
+            // Обновляем индикаторы точек
+            for (let i = 1; i <= totalLevels; i++) {
+                const dot = document.getElementById(`dot-${i}`);
+                if (i <= currentLevel) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            }
+        }
+
+        function showLevel(level) {
+            document.querySelectorAll('.challenge').forEach(challenge => {
+                challenge.classList.remove('active');
+            });
+            document.getElementById(`challenge-${level}`).classList.add('active');
+        }
+
+        function checkHTML() {
+            const input = document.getElementById('html-input').value.toLowerCase();
+            const feedback = document.getElementById('html-feedback');
+            
+            if (input.includes('<a') && input.includes('href') && input.includes('главная')) {
+                feedback.className = 'feedback success';
+                feedback.innerHTML = '✅ Отлично! Ты создал функциональную навигацию с ссылками!';
+                setTimeout(() => {
+                    currentLevel = 2;
+                    showLevel(2);
+                    updateProgress();
+                }, 1500);
+            } else {
+                feedback.className = 'feedback error';
+                feedback.innerHTML = '❌ Почти получилось! Нужно создать ссылку &lt;a href="#"&gt;Главная&lt;/a&gt; для первого пункта меню';
+            }
+        }
+
+        function checkCSS() {
+            const select = document.getElementById('css-select');
+            const feedback = document.getElementById('css-feedback');
+            
+            if (select.value.includes("box-shadow: 0 8px 25px rgba(0,0,0,0.15);")) {
+                feedback.className = 'feedback success';
+                feedback.innerHTML = '🎨 Прекрасно! Карточка теперь выглядит современно и профессионально!';
+                setTimeout(() => {
+                    currentLevel = 3;
+                    showLevel(3);
+                    updateProgress();
+                }, 1500);
+            } else {
+                feedback.className = 'feedback error';
+                feedback.innerHTML = '🎨 Интересный стиль, но для карточек лучше использовать тени (box-shadow) с плавными переходами';
+            }
+        }
+
+        function checkJS() {
+            const input = document.getElementById('js-input').value.toLowerCase();
+            const feedback = document.getElementById('js-feedback');
+            
+            if (input.includes('currentimage++') || input.includes('currentimage + 1') || 
+                input.includes('currentimage = (currentimage + 1)')) {
+                feedback.className = 'feedback success';
+                feedback.innerHTML = '⚡ Потрясающе! Галерея теперь может переключать изображения!';
+                setTimeout(() => {
+                    currentLevel = 4;
+                    showLevel(4);
+                    updateProgress();
+                }, 1500);
+            } else {
+                feedback.className = 'feedback error';
+                feedback.innerHTML = '⚡ Близко! Нужно увеличить currentImage на 1, используя currentImage++ или currentImage = currentImage + 1';
+            }
+        }
+
+        function checkCombined() {
+            const feedback = document.getElementById('combined-feedback');
+            
+            feedback.className = 'feedback success';
+            feedback.innerHTML = '📝 Идеально! Форма теперь проверяет данные перед отправкой!';
+            
+            setTimeout(() => {
+                document.getElementById('completion').style.display = 'block';
+                document.querySelectorAll('.challenge').forEach(challenge => {
+                    challenge.style.display = 'none';
+                });
+            }, 2000);
+        }
+
+        function showHint(level) {
+            const feedback = document.getElementById('combined-feedback');
+            feedback.className = 'feedback success';
+            feedback.innerHTML = '💡 Решение: Добавь проверку - if (name.trim() === "" || !email.includes("@")) { alert("Заполните поля"); return; }';
+        }
+
+        function restartQuest() {
+            currentLevel = 1;
+            updateProgress();
+            showLevel(1);
+            document.getElementById('completion').style.display = 'none';
+            
+            // Сброс всех полей ввода
+            document.getElementById('html-input').value = '';
+            document.getElementById('css-select').selectedIndex = 0;
+            document.getElementById('js-input').value = '';
+            
+            // Показываем все вызовы снова
+            document.querySelectorAll('.challenge').forEach(challenge => {
+                challenge.style.display = 'block';
+            });
+        }
+
+        // Инициализация
+        updateProgress();
+    </script>
+</body>
+</html>
